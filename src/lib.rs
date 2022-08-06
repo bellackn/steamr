@@ -1,6 +1,8 @@
 //! An HTTP client library to interact with Valve's Steam API, based on reqwest.
 //! Refer to [Steam's docs](https://developer.valvesoftware.com/wiki/Steam_Web_API#Interfaces_and_method)
 //! to learn more.
+#![deny(missing_docs)]
+#![deny(rustdoc::missing_doc_code_examples)]
 
 use crate::errors::SteamError;
 use reqwest::blocking::{Client, Response};
@@ -18,6 +20,7 @@ pub struct SteamClient {
 }
 
 impl SteamClient {
+    /// Returns a new SteamClient instance.
     pub fn new(api_key: &'static str) -> Self {
         let client = reqwest::blocking::Client::new();
         SteamClient { client, api_key }
