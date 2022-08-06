@@ -1,3 +1,5 @@
+//! Custom error types
+
 use reqwest::Error;
 use thiserror::Error;
 

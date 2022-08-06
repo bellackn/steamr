@@ -72,6 +72,25 @@ impl std::fmt::Display for Game {
 }
 
 /// Gets all games that are owned by the user with the given Steam ID.
+///
+/// Example:
+///
+/// ```should_panic
+/// // This specific example will panic since the API key is invalid and we're using "?".
+///
+/// # use steamr::SteamClient;
+/// # use steamr::owned_games::get_owned_games;
+/// # use steamr::errors::SteamError;
+/// fn main() -> Result<(), SteamError> {
+///     let steam_client = SteamClient::new("an-API-key");
+///     let steam_lib = get_owned_games(&steam_client, "some-steam-ID")?;
+///
+///     // Print out games that were played for more than an hour.
+///     steam_lib.games.iter().filter(|g| g.playtime_forever > 60).for_each(|g| println!("{}", g.name));
+///
+///     Ok(())
+/// }
+/// ```
 pub fn get_owned_games(client: &SteamClient, steam_id: &str) -> Result<OwnedGames, SteamError> {
     let response = client
         .send_steam_request(

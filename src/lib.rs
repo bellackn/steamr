@@ -6,7 +6,7 @@ use crate::errors::SteamError;
 use reqwest::blocking::{Client, Response};
 use reqwest::StatusCode;
 
-mod errors;
+pub mod errors;
 pub mod owned_games;
 
 /// This struct holds the blocking reqwest client and is used to interact with the API.
