@@ -1,6 +1,5 @@
-//! An HTTP client library to interact with Valve's Steam API, based on reqwest.
-//! Refer to [Steam's docs](https://developer.valvesoftware.com/wiki/Steam_Web_API#Interfaces_and_method)
-//! to learn more.
+#![doc = include_str!("../README.md")]
+
 #![deny(missing_docs)]
 #![deny(rustdoc::missing_doc_code_examples)]
 
