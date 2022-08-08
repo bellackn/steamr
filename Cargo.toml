@@ -1,7 +1,14 @@
 [package]
 name = "steamr"
 version = "0.1.0"
+description = "HTTP client library to communicate with Valve's Steam API"
 edition = "2021"
+homepage = "https://github.com/bellackn/steamr"
+repository = "https://github.com/bellackn/steamr"
+readme = "README.md"
+keywords = ["steam-api", "steam"]
+categories = ["api-bindings", ""]
+license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
