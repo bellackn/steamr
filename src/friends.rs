@@ -12,7 +12,7 @@ const ENDPOINT_GET_FRIENDLIST: &str = "https://api.steampowered.com/ISteamUser/G
 struct FriendsResponse {
     /// A list of [`Friend`]s
     #[serde(rename(deserialize = "friendslist"))]
-    response: FriendsList,
+    response: Option<FriendsList>,
 }
 
 /// This is the response that comes from the GetFriendList API.
@@ -57,14 +57,15 @@ pub enum SteamRelationship {
 ///
 /// Example:
 ///
-/// ```no_run
-/// // This specific example will not work since the API key is invalid and we're using "?".
+/// ```ignore
+/// // This specific example will not work since the API key is invalid and we're using "?". Also,
+/// // chrono is not part of this lib's dependencies.
 ///
 /// # use steamr::SteamClient;
 /// # use steamr::friends::get_friends;
 /// # use steamr::errors::SteamError;
 /// fn main() -> Result<(), SteamError> {
-///     let steam_client = SteamClient::new("an-API-key");
+///     let steam_client = SteamClient::new("an-api-key".to_string());
 ///     let steam_friends = get_friends(&steam_client, "some-steam-ID")?;
 ///
 ///     // Print friends
@@ -92,6 +93,11 @@ pub fn get_friends(client: &SteamClient, steam_id: &str) -> Result<Vec<Friend>, 
         )?
         .text()?;
 
-    let _res: FriendsResponse = serde_json::from_str(&response).unwrap();
-    Ok(_res.response.friends)
+    let _res: FriendsResponse =
+        serde_json::from_str(&response).unwrap_or(FriendsResponse { response: None });
+
+    match _res.response {
+        None => Err(SteamError::NoData),
+        Some(v) => Ok(v.friends),
+    }
 }

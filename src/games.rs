@@ -12,7 +12,7 @@ const ENDPOINT_OWNED_GAMES: &str =
 /// Helper struct used during deserializing the API response.
 #[derive(Debug, Deserialize)]
 struct OwnedGamesResponse {
-    response: OwnedGames,
+    response: Option<OwnedGames>,
 }
 
 /// This is the response that comes from the GetOwnedGames API.
@@ -69,8 +69,9 @@ impl std::fmt::Display for Game {
 /// # use steamr::games::get_owned_games;
 /// # use steamr::errors::SteamError;
 /// fn main() -> Result<(), SteamError> {
-///     let steam_client = SteamClient::new("an-API-key");
-///     let steam_lib = get_owned_games(&steam_client, "some-steam-ID")?;
+///     let steam_client = SteamClient::new("an-api-key".to_string());
+///     let steam_id = String::from("some-steam-id");
+///     let steam_lib = get_owned_games(&steam_client, &steam_id)?;
 ///
 ///     // Print out games that were played for more than an hour.
 ///     steam_lib.games.iter()
@@ -92,6 +93,11 @@ pub fn get_owned_games(client: &SteamClient, steam_id: &str) -> Result<OwnedGame
         )?
         .text()?;
 
-    let _res: OwnedGamesResponse = serde_json::from_str(&response)?;
-    Ok(_res.response)
+    let _res: OwnedGamesResponse =
+        serde_json::from_str(&response).unwrap_or(OwnedGamesResponse { response: None });
+
+    match _res.response {
+        None => Err(SteamError::NoData),
+        Some(v) => Ok(v),
+    }
 }

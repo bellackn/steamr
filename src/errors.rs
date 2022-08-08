@@ -10,16 +10,10 @@ pub enum SteamError {
     /// A reqwest failed for some reason
     #[error("Error response from steam: {0}")]
     FailedRequest(String),
-    /// serde failed during JSON parsing
-    #[error("Error with (de-)serializing JSON response")]
-    Serde,
-}
-
-#[doc(hidden)]
-impl From<serde_json::Error> for SteamError {
-    fn from(_: serde_json::Error) -> Self {
-        Self::Serde
-    }
+    /// The requested data is either private, or not present at all. Usually, this comes from a
+    /// deserialization error in serde.
+    #[error("The data you requested is either private or empty")]
+    NoData,
 }
 
 #[doc(hidden)]

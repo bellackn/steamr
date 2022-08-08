@@ -15,12 +15,12 @@ pub struct SteamClient {
     /// A [`reqwest::blocking`] HTTP client
     client: Client,
     /// The dev's Steam API key
-    api_key: &'static str,
+    api_key: String,
 }
 
 impl SteamClient {
     /// Returns a new SteamClient instance.
-    pub fn new(api_key: &'static str) -> Self {
+    pub fn new(api_key: String) -> Self {
         let client = reqwest::blocking::Client::new();
         SteamClient { client, api_key }
     }
@@ -34,7 +34,7 @@ impl SteamClient {
         let response = self
             .client
             .get(endpoint)
-            .query(&[("key", self.api_key)])
+            .query(&[("key", self.api_key.clone())])
             .query(&query_params)
             .send();
 
