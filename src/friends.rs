@@ -55,11 +55,10 @@ pub enum SteamRelationship {
 
 /// Gets all friends from the user with the provided Steam ID.
 ///
-/// /// Example:
+/// Example:
 ///
-/// ```should_not_compile
+/// ```no_run
 /// // This specific example will not work since the API key is invalid and we're using "?".
-/// // Also, the chrono crate is not part of this library.
 ///
 /// # use steamr::SteamClient;
 /// # use steamr::friends::get_friends;

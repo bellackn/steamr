@@ -9,7 +9,7 @@ You need a valid API key to use this library. Visit <https://steamcommunity.com/
 
 ## Example
 
-```{.rust .should_panic}
+```rust,no_run
 use steamr::SteamClient;
 use steamr::errors::SteamError;
 use steamr::games::get_owned_games;

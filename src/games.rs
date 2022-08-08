@@ -62,8 +62,8 @@ impl std::fmt::Display for Game {
 ///
 /// Example:
 ///
-/// ```should_panic
-/// // This specific example will panic since the API key is invalid and we're using "?".
+/// ```no_run
+/// // This specific example will not work since the API key is invalid and we're using "?".
 ///
 /// # use steamr::SteamClient;
 /// # use steamr::games::get_owned_games;
@@ -73,7 +73,9 @@ impl std::fmt::Display for Game {
 ///     let steam_lib = get_owned_games(&steam_client, "some-steam-ID")?;
 ///
 ///     // Print out games that were played for more than an hour.
-///     steam_lib.games.iter().filter(|g| g.playtime_forever > 60).for_each(|g| println!("{}", g.name));
+///     steam_lib.games.iter()
+///         .filter(|g| g.playtime_forever > 60)
+///         .for_each(|g| println!("{}", g.name));
 ///
 ///     Ok(())
 /// }
