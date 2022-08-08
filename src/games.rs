@@ -1,4 +1,4 @@
-//! Contains all functionality regarding the GetOwnedGames endpoint
+//! Contains all functionalities around games
 
 use crate::errors::SteamError;
 use crate::SteamClient;
@@ -19,7 +19,7 @@ struct OwnedGamesResponse {
 #[derive(Debug, Deserialize)]
 pub struct OwnedGames {
     /// Number of games in a user's library
-    pub game_count: u16,
+    pub game_count: u64,
     /// List of [`Game`]s in a user's library
     pub games: Vec<Game>,
 }
@@ -27,32 +27,19 @@ pub struct OwnedGames {
 /// Represents a game and its metadata.
 #[derive(Debug, Deserialize)]
 pub struct Game {
-    #[serde(alias = "appid")]
+    #[serde(rename(deserialize = "appid"))]
     /// Game ID
-    pub app_id: u32,
+    pub app_id: u64,
     /// Name of the game
     pub name: String,
     /// Total playtime in minutes
-    pub playtime_forever: u32,
+    pub playtime_forever: u64,
     /// Playtime in minutes on Windows
-    pub playtime_windows_forever: u32,
+    pub playtime_windows_forever: u64,
     /// Playtime in minutes on Mac
-    pub playtime_mac_forever: u32,
+    pub playtime_mac_forever: u64,
     /// Playtime in minutes on Linux
-    pub playtime_linux_forever: u32,
-}
-
-impl Default for Game {
-    fn default() -> Self {
-        Self {
-            app_id: 0,
-            name: "default".to_string(),
-            playtime_forever: 0,
-            playtime_windows_forever: 0,
-            playtime_mac_forever: 0,
-            playtime_linux_forever: 0,
-        }
-    }
+    pub playtime_linux_forever: u64,
 }
 
 impl PartialEq for Game {
@@ -79,7 +66,7 @@ impl std::fmt::Display for Game {
 /// // This specific example will panic since the API key is invalid and we're using "?".
 ///
 /// # use steamr::SteamClient;
-/// # use steamr::owned_games::get_owned_games;
+/// # use steamr::games::get_owned_games;
 /// # use steamr::errors::SteamError;
 /// fn main() -> Result<(), SteamError> {
 ///     let steam_client = SteamClient::new("an-API-key");
@@ -103,6 +90,6 @@ pub fn get_owned_games(client: &SteamClient, steam_id: &str) -> Result<OwnedGame
         )?
         .text()?;
 
-    let _ogr: OwnedGamesResponse = serde_json::from_str(&response)?;
-    Ok(_ogr.response)
+    let _res: OwnedGamesResponse = serde_json::from_str(&response)?;
+    Ok(_res.response)
 }

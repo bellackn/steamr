@@ -1,5 +1,4 @@
 #![doc = include_str!("../README.md")]
-
 #![deny(missing_docs)]
 #![deny(rustdoc::missing_doc_code_examples)]
 
@@ -8,7 +7,8 @@ use reqwest::blocking::{Client, Response};
 use reqwest::StatusCode;
 
 pub mod errors;
-pub mod owned_games;
+pub mod friends;
+pub mod games;
 
 /// This struct holds the blocking reqwest client and is used to interact with the API.
 pub struct SteamClient {
@@ -42,10 +42,10 @@ impl SteamClient {
             Ok(r) => match r.status() {
                 StatusCode::OK => Ok(r),
                 StatusCode::UNAUTHORIZED => {
-                    Err(SteamError::FailedRequest("Invalid API key".to_string()))
+                    Err(SteamError::FailedRequest("Unauthorized. Either you have used an invalid API key, or the data you wanted to access is private".to_string()))
                 }
                 _ => Err(SteamError::FailedRequest(
-                    "Unknown response from Steam".to_string(),
+                    "Steam could not process your request. Double-check your provided Steam IDs.".to_string(),
                 )),
             },
             Err(_) => Err(SteamError::FailedRequest(
