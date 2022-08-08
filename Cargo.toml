@@ -7,7 +7,7 @@ homepage = "https://github.com/bellackn/steamr"
 repository = "https://github.com/bellackn/steamr"
 readme = "README.md"
 keywords = ["steam-api", "steam"]
-categories = ["api-bindings", ""]
+categories = ["api-bindings"]
 license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
