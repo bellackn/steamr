@@ -32,4 +32,4 @@ fn main() -> Result<(), SteamError> {
 }
 ```
 
-> 💡 Have a look at the crate's docs to see more examples.
+> 💡 You can find more examples on the crate's doc.rs pages.
