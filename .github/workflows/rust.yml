@@ -19,4 +19,7 @@ jobs:
       - name: Build
         run: cargo build --verbose
       - name: Run tests
+        env:
+          IT_API_KEY: ${{ secrets.IT_API_KEY }}
+          IT_STEAM_ID: ${{ secrets.IT_STEAM_ID }}
         run: cargo test --verbose
