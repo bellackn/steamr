@@ -1,5 +1,10 @@
 # steamr 🦀
 
+[![crates.io](https://img.shields.io/crates/v/steamr.svg)](https://crates.io/crates/steamr)
+[![Documentation](https://docs.rs/steamr/badge.svg)](https://docs.rs/steamr)
+[![MIT/Apache-2 licensed](https://img.shields.io/crates/l/steamr.svg)](./LICENSE-APACHE)
+[![CI](https://github.com/bellackn/steamr/workflows/CI/badge.svg)](https://github.com/bellackn/steamr/actions?query=workflow%3ACI)
+
 steamr is a simple Rust library to help you to interact with Valve's [Steam API](https://developer.valvesoftware.com/wiki/Steam_Web_API).
 It uses the [reqwest](https://github.com/seanmonstar/reqwest) crate under the hood.
 
