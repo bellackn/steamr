@@ -1,6 +1,6 @@
 [package]
 name = "steamr"
-version = "0.1.0"
+version = "0.2.0"
 description = "HTTP client library to communicate with Valve's Steam API"
 edition = "2021"
 homepage = "https://github.com/bellackn/steamr"
