@@ -9,6 +9,9 @@ use std::fmt::Formatter;
 const ENDPOINT_OWNED_GAMES: &str =
     "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001";
 
+/// The Steam API "GetNewsForApp (v0002)" endpoint
+const ENDPOINT_GAME_NEWS: &str = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002";
+
 /// Helper struct used during deserializing the API response.
 #[derive(Debug, Deserialize)]
 struct OwnedGamesResponse {
@@ -95,6 +98,93 @@ pub fn get_owned_games(client: &SteamClient, steam_id: &str) -> Result<OwnedGame
 
     let _res: OwnedGamesResponse =
         serde_json::from_str(&response).unwrap_or(OwnedGamesResponse { response: None });
+
+    match _res.response {
+        None => Err(SteamError::NoData),
+        Some(v) => Ok(v),
+    }
+}
+
+/// Helper struct used during deserializing the API response.
+#[derive(Debug, Deserialize)]
+struct GameNewsResponse {
+    #[serde(rename(deserialize = "appnews"))]
+    response: Option<GameNews>,
+}
+
+/// Response from the GetNewsForApp API
+#[derive(Debug, Deserialize)]
+pub struct GameNews {
+    /// List of [`News`] for a given game ID
+    #[serde(rename(deserialize = "newsitems"))]
+    pub game_news: Vec<News>,
+    /// The total number of available news for the given game ID
+    pub count: i16,
+}
+
+/// A Steam news object
+#[derive(Debug, Deserialize)]
+pub struct News {
+    /// News ID
+    #[serde(rename(deserialize = "gid"))]
+    pub news_id: String,
+    /// Title
+    pub title: String,
+    /// URL
+    pub url: String,
+    /// News author
+    pub author: String,
+    /// News content
+    pub contents: String,
+    /// Date as UNIX timestamp
+    pub date: i64,
+    /// Name of the feed
+    #[serde(rename(deserialize = "feedname"))]
+    pub feed_name: String,
+}
+
+/// Returns the news for a game.
+///
+/// You can control both the number of news tha you want to fetch and
+/// the maximum length of the news content (although this does not work strictly, for example when
+/// it contains hyperlinks, so this is not a number to rely on!)
+///
+/// Example:
+///
+/// ```
+/// # use steamr::SteamClient;
+/// # use steamr::games::get_game_news;
+/// # use steamr::errors::SteamError;
+/// fn main() -> Result<(), SteamError> {
+///     let steam_client = SteamClient::new("an-api-key".to_string());
+///     let game_id = String::from("10");  // This is CS:GO
+///     let news = get_game_news(&steam_client, game_id, 5, 100)?;
+///
+///     news.game_news.iter()
+///         .for_each(|n| println!("The article '{}' was written by '{}'", n.title, n.author));
+///
+///     Ok(())
+/// }
+/// ```
+pub fn get_game_news(
+    client: &SteamClient,
+    game_id: String,
+    news_count: u16,
+    max_length: u16,
+) -> Result<GameNews, SteamError> {
+    let response = client
+        .send_steam_request(
+            ENDPOINT_GAME_NEWS,
+            vec![
+                ("appid", game_id),
+                ("count", news_count.to_string()),
+                ("maxlength", max_length.to_string()),
+            ],
+        )?
+        .text()?;
+
+    let _res: GameNewsResponse =
+        serde_json::from_str(&response).unwrap_or(GameNewsResponse { response: None });
 
     match _res.response {
         None => Err(SteamError::NoData),

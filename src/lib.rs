@@ -5,6 +5,7 @@
 use crate::errors::SteamError;
 use reqwest::blocking::{Client, Response};
 use reqwest::StatusCode;
+use serde::Serialize;
 
 pub mod errors;
 pub mod friends;
@@ -26,10 +27,10 @@ impl SteamClient {
     }
 
     /// A common function used to send requests to Steam's API and to return JSON data.
-    fn send_steam_request(
+    fn send_steam_request<T: Serialize>(
         &self,
         endpoint: &str,
-        query_params: Vec<(&str, &str)>,
+        query_params: Vec<(&str, T)>,
     ) -> Result<Response, SteamError> {
         let response = self
             .client
