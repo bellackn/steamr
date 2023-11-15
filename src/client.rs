@@ -44,7 +44,7 @@ impl ApiClient for SteamClient {
                     Err(SteamError::FailedRequest("Unauthorized. Either you have used an invalid API key, or the data you wanted to access is private".to_string()))
                 }
                 _ => Err(SteamError::FailedRequest(
-                    "Steam could not process your request. Double-check your provided Steam IDs.".to_string(),
+                    "Steam could not process your request. Double-check your provided parameters (Steam ID, app ID, ...).".to_string(),
                 )),
             },
             Err(_) => Err(SteamError::FailedRequest(

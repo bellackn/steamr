@@ -12,6 +12,10 @@ const ENDPOINT_OWNED_GAMES: &str =
 /// The Steam API "GetNewsForApp (v0002)" endpoint
 const ENDPOINT_GAME_NEWS: &str = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002";
 
+/// The Steam API "GetUserStatsForGame (v0002) endpoint
+const ENDPOINT_USER_STATS_FOR_GAME: &str =
+    "https://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002";
+
 /// Helper struct used during deserializing the API response.
 #[derive(Debug, Deserialize)]
 struct OwnedGamesResponse {
@@ -61,19 +65,52 @@ impl std::fmt::Display for Game {
     }
 }
 
+/// Helper struct used during deserialization of the API response.
+#[derive(Debug, Deserialize)]
+struct UserStatsResponse {
+    #[serde(rename(deserialize = "playerstats"))]
+    response: Option<PlayerStats>,
+}
+
+/// This struct holds the player statistics.
+#[derive(Debug, Deserialize)]
+pub struct PlayerStats {
+    #[serde(rename(deserialize = "gameName"))]
+    /// Name of the game
+    pub game_name: String,
+    /// List of achievements
+    pub achievements: Vec<Achievement>,
+    /// List of other stats
+    pub stats: Vec<Stat>,
+}
+
+/// A single achievement.
+#[derive(Debug, Deserialize)]
+pub struct Achievement {
+    /// Name of the achievement.
+    pub name: String,
+}
+
+/// A list of stats.
+#[derive(Debug, Deserialize)]
+pub struct Stat {
+    /// Name of the stat.
+    pub name: String,
+    /// Value of the stat.
+    pub value: u16,
+}
+
 /// Gets all games that are owned by the user with the given Steam ID.
 ///
 /// Example:
 ///
 /// ```no_run
-/// // This specific example will not work since the API key is invalid and we're using "?".
-///
 /// # use steamr::client::SteamClient;
 /// # use steamr::games::get_owned_games;
 /// # use steamr::errors::SteamError;
 /// fn main() -> Result<(), SteamError> {
 ///     let steam_client = SteamClient::new("an-api-key".to_string());
-///     let steam_id = String::from("some-steam-id");
+///     let steam_id = "some-steam-id";
 ///     let steam_lib = get_owned_games(&steam_client, &steam_id)?;
 ///
 ///     // Print out games that were played for more than an hour.
@@ -155,8 +192,8 @@ pub struct News {
 /// # use steamr::errors::SteamError;
 /// fn main() -> Result<(), SteamError> {
 ///     let steam_client = SteamClient::new("an-api-key".to_string());
-///     let game_id = String::from("10");  // This is CS:GO
-///     let news = get_game_news(&steam_client, game_id, 5, 100)?;
+///     let app_id ="10";  // This is CS:GO
+///     let news = get_game_news(&steam_client, app_id, 5, 100)?;
 ///
 ///     news.game_news.iter()
 ///         .for_each(|n| println!("The article '{}' was written by '{}'", n.title, n.author));
@@ -166,21 +203,61 @@ pub struct News {
 /// ```
 pub fn get_game_news(
     client: &SteamClient,
-    game_id: String,
+    app_id: &str,
     news_count: u16,
     max_length: u16,
 ) -> Result<GameNews, SteamError> {
     let response = client.get_request(
         ENDPOINT_GAME_NEWS,
         vec![
-            ("appid", game_id),
-            ("count", news_count.to_string()),
-            ("maxlength", max_length.to_string()),
+            ("appid", app_id),
+            ("count", &news_count.to_string()),
+            ("maxlength", &max_length.to_string()),
         ],
     )?;
 
     let _res: GameNewsResponse =
         serde_json::from_value(response).unwrap_or(GameNewsResponse { response: None });
+
+    match _res.response {
+        None => Err(SteamError::NoData),
+        Some(v) => Ok(v),
+    }
+}
+
+/// Returns the stats of a given player and app ID.
+///
+/// Example:
+///
+/// ```no_run
+/// # use steamr::client::SteamClient;
+/// # use steamr::games::get_player_stats;
+/// # use steamr::errors::SteamError;
+///
+/// fn main() -> Result<(), SteamError> {
+///     let steam_client = SteamClient::new("an-api-key".to_string());
+///     let player_stats = get_player_stats(&steam_client, "some-steam-ID", "some-app-ID")?;
+///
+///     println!("Showing stats for the game '{}'", &player_stats.game_name);
+///
+///     player_stats.achievements.iter().for_each(|a| println!("Achievement: {}", a.name));
+///     player_stats.stats.iter().for_each(|s| println!("Stat: {}, Value: {}", s.name, s.value));
+///
+///     Ok(())
+/// }
+/// ```
+pub fn get_player_stats(
+    client: &SteamClient,
+    steam_id: &str,
+    app_id: &str,
+) -> Result<PlayerStats, SteamError> {
+    let response = client.get_request(
+        ENDPOINT_USER_STATS_FOR_GAME,
+        vec![("steamid", steam_id), ("appid", app_id)],
+    )?;
+
+    let _res: UserStatsResponse =
+        serde_json::from_value(response).unwrap_or(UserStatsResponse { response: None });
 
     match _res.response {
         None => Err(SteamError::NoData),
