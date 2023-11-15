@@ -91,7 +91,7 @@ pub struct Achievement {
     pub name: String,
 }
 
-/// A list of stats.
+/// A stat.
 #[derive(Debug, Deserialize)]
 pub struct Stat {
     /// Name of the stat.
