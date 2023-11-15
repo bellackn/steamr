@@ -58,33 +58,33 @@ pub enum SteamRelationship {
 ///
 /// Example:
 ///
-/// ```ignore
-/// // This specific example will not work since the API key is invalid and we're using "?". Also,
-/// // chrono is not part of this lib's dependencies.
-///
+/// ```no_run
 /// # use steamr::client::SteamClient;
 /// # use steamr::friends::get_friends;
 /// # use steamr::errors::SteamError;
+///
 /// fn main() -> Result<(), SteamError> {
 ///     let steam_client = SteamClient::new("an-api-key".to_string());
 ///     let steam_friends = get_friends(&steam_client, "some-steam-ID")?;
 ///
 ///     // Print friends
 ///     steam_friends.iter().for_each(|f| println!("{}", f));
-///
-///     // The standard format of "friends since" is the UNIX timestamp, you might want to get a
-///     // more intuitive time format. You could use the `chrono` crate for this:
-///     let steam_friends_2 = get_friends(&steam_client, "some-steam-ID")?;
-///     steam_friends_2.iter().for_each(|f| {
-///         println!(
-///             "me and {} are friends since {}",
-///             f.steam_id,
-///             chrono::NaiveDateTime::from_timestamp(f.friend_since, 0)
-///         )
-///     });
-///
+///     
 ///     Ok(())
-/// }
+///  }
+/// ```
+///
+///  The standard format of "friends since" is the UNIX timestamp, you might want to get a
+///  more intuitive time format. You could use the `chrono` crate for this:
+/// ```ignore
+///  let steam_friends = get_friends(&steam_client, "some-steam-ID")?;
+///  steam_friends.iter().for_each(|f| {
+///      println!(
+///          "me and {} are friends since {}",
+///          f.steam_id,
+///          chrono::NaiveDateTime::from_timestamp(f.friend_since, 0)
+///      )
+///  });
 /// ```
 pub fn get_friends(client: &SteamClient, steam_id: &str) -> Result<Vec<Friend>, SteamError> {
     let response = client.get_request(
