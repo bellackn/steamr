@@ -31,10 +31,12 @@ fn user_stats_response_is_valid() {
     let test_api_key = std::env::var("IT_API_KEY").expect("IT_API_KEY variable not provided");
     let test_client = SteamClient::new(test_api_key);
     let test_steam_id = std::env::var("IT_STEAM_ID").expect("IT_STEAM_ID variable not provided");
-    let test_app_id = "1086940"; // This is Baldur's Gate 3
+    let test_app_id = "1086940";
 
     let test_player_stats = get_player_stats(&test_client, &test_steam_id, test_app_id)
         .unwrap_or_else(|e| panic!("{:?}", e));
 
     assert_eq!(test_player_stats.game_name, "Baldur's Gate 3");
+    assert!(!test_player_stats.achievements.is_empty());
+    assert!(!test_player_stats.stats.is_empty());
 }
