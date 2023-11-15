@@ -1,7 +1,7 @@
 //! Contains all functionalities around games
 
+use crate::client::{ApiClient, SteamClient};
 use crate::errors::SteamError;
-use crate::SteamClient;
 use serde::Deserialize;
 use std::fmt::Formatter;
 
@@ -68,7 +68,7 @@ impl std::fmt::Display for Game {
 /// ```no_run
 /// // This specific example will not work since the API key is invalid and we're using "?".
 ///
-/// # use steamr::SteamClient;
+/// # use steamr::client::SteamClient;
 /// # use steamr::games::get_owned_games;
 /// # use steamr::errors::SteamError;
 /// fn main() -> Result<(), SteamError> {
@@ -85,19 +85,17 @@ impl std::fmt::Display for Game {
 /// }
 /// ```
 pub fn get_owned_games(client: &SteamClient, steam_id: &str) -> Result<OwnedGames, SteamError> {
-    let response = client
-        .send_steam_request(
-            ENDPOINT_OWNED_GAMES,
-            vec![
-                ("steamid", steam_id),
-                ("include_appInfo", "true"),
-                ("include_played_free_games", "true"),
-            ],
-        )?
-        .text()?;
+    let response = client.get_request(
+        ENDPOINT_OWNED_GAMES,
+        vec![
+            ("steamid", steam_id),
+            ("include_appInfo", "true"),
+            ("include_played_free_games", "true"),
+        ],
+    )?;
 
     let _res: OwnedGamesResponse =
-        serde_json::from_str(&response).unwrap_or(OwnedGamesResponse { response: None });
+        serde_json::from_value(response).unwrap_or(OwnedGamesResponse { response: None });
 
     match _res.response {
         None => Err(SteamError::NoData),
@@ -152,7 +150,7 @@ pub struct News {
 /// Example:
 ///
 /// ```
-/// # use steamr::SteamClient;
+/// # use steamr::client::SteamClient;
 /// # use steamr::games::get_game_news;
 /// # use steamr::errors::SteamError;
 /// fn main() -> Result<(), SteamError> {
@@ -172,19 +170,17 @@ pub fn get_game_news(
     news_count: u16,
     max_length: u16,
 ) -> Result<GameNews, SteamError> {
-    let response = client
-        .send_steam_request(
-            ENDPOINT_GAME_NEWS,
-            vec![
-                ("appid", game_id),
-                ("count", news_count.to_string()),
-                ("maxlength", max_length.to_string()),
-            ],
-        )?
-        .text()?;
+    let response = client.get_request(
+        ENDPOINT_GAME_NEWS,
+        vec![
+            ("appid", game_id),
+            ("count", news_count.to_string()),
+            ("maxlength", max_length.to_string()),
+        ],
+    )?;
 
     let _res: GameNewsResponse =
-        serde_json::from_str(&response).unwrap_or(GameNewsResponse { response: None });
+        serde_json::from_value(response).unwrap_or(GameNewsResponse { response: None });
 
     match _res.response {
         None => Err(SteamError::NoData),

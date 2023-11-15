@@ -1,5 +1,5 @@
 use steamr::games::{get_game_news, get_owned_games};
-use steamr::SteamClient;
+use steamr::client::SteamClient;
 
 #[test]
 fn games_response_is_valid() {
@@ -10,8 +10,8 @@ fn games_response_is_valid() {
     let test_steam_lib =
         get_owned_games(&test_client, &test_steam_id).unwrap_or_else(|e| panic!("{:?}", e));
 
-    assert!(test_steam_lib.games.len() > 0);
-    assert!(test_steam_lib.games[0].name.len() > 0);
+    assert!(!test_steam_lib.games.is_empty());
+    assert!(!test_steam_lib.games[0].name.is_empty());
 }
 
 #[test]

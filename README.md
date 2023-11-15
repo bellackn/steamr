@@ -15,7 +15,7 @@ You need a valid API key to use this library. Visit <https://steamcommunity.com/
 ## Example
 
 ```rust,no_run
-use steamr::SteamClient;
+use steamr::client::SteamClient;
 use steamr::errors::SteamError;
 use steamr::games::get_owned_games;
 
@@ -36,5 +36,3 @@ fn main() -> Result<(), SteamError> {
     Ok(())
 }
 ```
-
-> 💡 You can find more examples on the crate's doc.rs pages.

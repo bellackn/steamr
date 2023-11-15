@@ -1,6 +1,7 @@
 //! Functions to handle any friends-related data
 
-use crate::{SteamClient, SteamError};
+use crate::client::{ApiClient, SteamClient};
+use crate::errors::SteamError;
 use serde::Deserialize;
 use std::fmt::Formatter;
 
@@ -61,7 +62,7 @@ pub enum SteamRelationship {
 /// // This specific example will not work since the API key is invalid and we're using "?". Also,
 /// // chrono is not part of this lib's dependencies.
 ///
-/// # use steamr::SteamClient;
+/// # use steamr::client::SteamClient;
 /// # use steamr::friends::get_friends;
 /// # use steamr::errors::SteamError;
 /// fn main() -> Result<(), SteamError> {
@@ -86,15 +87,13 @@ pub enum SteamRelationship {
 /// }
 /// ```
 pub fn get_friends(client: &SteamClient, steam_id: &str) -> Result<Vec<Friend>, SteamError> {
-    let response = client
-        .send_steam_request(
-            ENDPOINT_GET_FRIENDLIST,
-            vec![("steamid", steam_id), ("relationship", "friend")],
-        )?
-        .text()?;
+    let response = client.get_request(
+        ENDPOINT_GET_FRIENDLIST,
+        vec![("steamid", steam_id), ("relationship", "friend")],
+    )?;
 
     let _res: FriendsResponse =
-        serde_json::from_str(&response).unwrap_or(FriendsResponse { response: None });
+        serde_json::from_value(response).unwrap_or(FriendsResponse { response: None });
 
     match _res.response {
         None => Err(SteamError::NoData),
