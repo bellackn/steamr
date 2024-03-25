@@ -26,7 +26,7 @@ release version: lint test
     echo 'committing changes'
     git add .
     git commit -m 'feat: update crate to version {{version}}'
-    git tag -a -s -m 'release version {{version}}' {{version}}
+    git tag -a -s -m 'Release of version {{version}}; see CHANGELOG.md' {{version}}
     git push
     git push --tags
     
