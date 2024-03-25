@@ -21,6 +21,8 @@ release version: lint test
     read -n 1 -s -r -p "you're about to release {{version}} - press any button to continue"
     echo 'updating version in Cargo.toml to {{version}}'
     sed -i -e 's/^version = ".*"$/version = "{{version}}"/' Cargo.toml
+    cargo publish
+    echo 'successfully published crate'
     echo 'committing changes'
     git add .
     git commit -m 'feat: update crate to version {{version}}'
