@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+* `#![deny(rustdoc::missing_doc_code_examples)]` directive (see [issue #101730](https://github.com/rust-lang/rust/issues/101730) for details)
+
 ## [0.3.1] - 2024-03-25
 
 ### Changed
