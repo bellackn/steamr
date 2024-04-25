@@ -1,4 +1,4 @@
-//! Functions to handle any friends-related data
+//! Functionality dealing with an account's friends
 
 use crate::client::{ApiClient, SteamClient};
 use crate::errors::SteamError;
@@ -54,49 +54,50 @@ pub enum SteamRelationship {
     Friend,
 }
 
-/// Gets all friends from the user with the provided Steam ID.
-///
-/// Example:
-///
-/// ```no_run
-/// # use steamr::client::SteamClient;
-/// # use steamr::friends::get_friends;
-/// # use steamr::errors::SteamError;
-///
-/// fn main() -> Result<(), SteamError> {
-///     let steam_client = SteamClient::new("an-api-key".to_string());
-///     let steam_friends = get_friends(&steam_client, "some-steam-ID")?;
-///
-///     // Print friends
-///     steam_friends.iter().for_each(|f| println!("{}", f));
-///     
-///     Ok(())
-///  }
-/// ```
-///
-///  The standard format of "friends since" is the UNIX timestamp, you might want to get a
-///  more intuitive time format. You could use the `chrono` crate for this:
-/// ```ignore
-///  let steam_friends = get_friends(&steam_client, "some-steam-ID")?;
-///  steam_friends.iter().for_each(|f| {
-///      println!(
-///          "me and {} are friends since {}",
-///          f.steam_id,
-///          chrono::NaiveDateTime::from_timestamp(f.friend_since, 0)
-///      )
-///  });
-/// ```
-pub fn get_friends(client: &SteamClient, steam_id: &str) -> Result<Vec<Friend>, SteamError> {
-    let response = client.get_request(
-        ENDPOINT_GET_FRIENDLIST,
-        vec![("steamid", steam_id), ("relationship", "friend")],
-    )?;
+impl SteamClient {
+    /// Gets all friends from the user with the provided Steam ID.
+    ///
+    /// Example:
+    ///
+    /// ```no_run
+    /// # use steamr::client::SteamClient;
+    /// # use steamr::errors::SteamError;
+    ///
+    /// fn main() -> Result<(), SteamError> {
+    ///     let steam_client = SteamClient::from("an-api-key".to_string());
+    ///     let steam_friends = steam_client.get_friends("some-steam-ID")?;
+    ///
+    ///     // Print friends
+    ///     steam_friends.iter().for_each(|f| println!("{}", f));
+    ///     
+    ///     Ok(())
+    ///  }
+    /// ```
+    ///
+    ///  The standard format of "friends since" is the UNIX timestamp, you might want to get a
+    ///  more intuitive time format. You could use the `chrono` crate for this:
+    /// ```ignore
+    ///  let steam_friends = get_friends(&steam_client, "some-steam-ID")?;
+    ///  steam_friends.iter().for_each(|f| {
+    ///      println!(
+    ///          "me and {} are friends since {}",
+    ///          f.steam_id,
+    ///          chrono::NaiveDateTime::from_timestamp(f.friend_since, 0)
+    ///      )
+    ///  });
+    /// ```
+    pub fn get_friends(&self, steam_id: &str) -> Result<Vec<Friend>, SteamError> {
+        let response = self.get_request(
+            ENDPOINT_GET_FRIENDLIST,
+            vec![("steamid", steam_id), ("relationship", "friend")],
+        )?;
 
-    let _res: FriendsResponse =
-        serde_json::from_value(response).unwrap_or(FriendsResponse { response: None });
+        let _res: FriendsResponse =
+            serde_json::from_value(response).unwrap_or(FriendsResponse { response: None });
 
-    match _res.response {
-        None => Err(SteamError::NoData),
-        Some(v) => Ok(v.friends),
+        match _res.response {
+            None => Err(SteamError::NoData),
+            Some(v) => Ok(v.friends),
+        }
     }
 }

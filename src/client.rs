@@ -1,6 +1,7 @@
 //! The Steam API client
 
 use crate::errors::SteamError;
+use log::warn;
 use reqwest::blocking::Client;
 use reqwest::StatusCode;
 use serde::Serialize;
@@ -30,6 +31,9 @@ impl ApiClient for SteamClient {
         endpoint: &str,
         query: Vec<(&str, T)>,
     ) -> Result<Value, SteamError> {
+        if self.api_key.len() == 0 {
+            warn!("Not using a valid API key. Is this on purpose?")
+        }
         let response = self
             .client
             .get(endpoint)
@@ -55,9 +59,18 @@ impl ApiClient for SteamClient {
 }
 
 impl SteamClient {
-    /// Returns a new SteamClient instance.
-    pub fn new(api_key: String) -> Self {
+    /// Returns a new SteamClient instance carrying a developer API token
+    pub fn from(api_key: String) -> Self {
         let client = reqwest::blocking::Client::new();
-        SteamClient { client, api_key }
+        Self { client, api_key }
+    }
+
+    /// Return a SteamClient without a Steam API token
+    pub fn new() -> Self {
+        let client = reqwest::blocking::Client::new();
+        Self {
+            client,
+            api_key: String::new(),
+        }
     }
 }
