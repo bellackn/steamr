@@ -78,7 +78,7 @@ impl SteamClient {
     /// # use steamr::errors::SteamError;
     /// fn main() -> Result<(), SteamError> {
     ///     let steam_client = SteamClient::from("an-api-key".to_string());
-    ///     let steam_id = "some-steam-id";
+    ///     let steam_id = String::from("some-steam-id");
     ///     let steam_lib = steam_client.get_library(&steam_id)?;
     ///
     ///     // Print out games that were played for more than an hour.

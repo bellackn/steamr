@@ -71,7 +71,7 @@ impl SteamClient {
     /// # use steamr::errors::SteamError;
     /// fn main() -> Result<(), SteamError> {
     ///     let steam_client = SteamClient::from("an-api-key".to_string());
-    ///     let app_id ="10";  // This is CS:GO
+    ///     let app_id = "10";  // This is CS:GO
     ///     let news = steam_client.get_game_news(app_id, 5, 100)?;
     ///
     ///     news.game_news.iter()

@@ -24,7 +24,7 @@ fn main() -> Result<(), SteamError> {
     let steam_client = SteamClient::from(api_key);
 
     // Get a list of all games from the user with the provided Steam ID (given that they are publicly visible)
-    let steam_id = "some-steam-id";
+    let steam_id = String::from("some-steam-id");
     let steam_lib = steam_client.get_library(&steam_id)?;
 
     // Print out the games that were played for more than an hour.
