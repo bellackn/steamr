@@ -16,7 +16,6 @@ pub enum SteamError {
     NoData,
 }
 
-#[doc(hidden)]
 impl From<reqwest::Error> for SteamError {
     fn from(err: Error) -> Self {
         // If the reqwest goes wrong, we should forward it to the user

@@ -13,7 +13,7 @@ build:
     @ cargo build
 
 doc:
-    @ cargo doc --no-deps
+    @ cargo doc --no-deps --open
 
 # Publish the crate on crates.io
 release version: lint test
