@@ -1,6 +1,6 @@
 //! Implementation for the GetUserStatsForGame endpoint
 
-use crate::client::{ApiClient, SteamClient};
+use crate::client::SteamClient;
 use crate::errors::SteamError;
 use serde::Deserialize;
 
@@ -16,7 +16,7 @@ struct PlayerStatsResponse {
 }
 
 /// This struct holds the player statistics.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 pub struct PlayerStats {
     #[serde(rename(deserialize = "gameName"))]
     /// Name of the game
@@ -25,6 +25,17 @@ pub struct PlayerStats {
     pub achievements: Vec<Achievement>,
     /// List of other stats
     pub stats: Vec<Stat>,
+}
+
+impl From<PlayerStatsResponse> for PlayerStats {
+    fn from(value: PlayerStatsResponse) -> Self {
+        let v = value.response.unwrap_or_default();
+        Self {
+            game_name: v.game_name,
+            achievements: v.achievements,
+            stats: v.stats,
+        }
+    }
 }
 
 /// A single achievement.
@@ -74,12 +85,9 @@ impl SteamClient {
             vec![("steamid", steam_id), ("appid", app_id)],
         )?;
 
-        let _res: PlayerStatsResponse =
-            serde_json::from_value(response).unwrap_or(PlayerStatsResponse { response: None });
-
-        match _res.response {
-            None => Err(SteamError::NoData),
-            Some(v) => Ok(v),
-        }
+        let stats = self
+            .parse_response::<PlayerStatsResponse, PlayerStats>(response)
+            .unwrap();
+        Ok(stats)
     }
 }

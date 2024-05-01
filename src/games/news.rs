@@ -2,10 +2,7 @@
 
 use serde::Deserialize;
 
-use crate::{
-    client::{ApiClient, SteamClient},
-    errors::SteamError,
-};
+use crate::{client::SteamClient, errors::SteamError};
 
 /// The Steam API "GetNewsForApp (v0002)" endpoint
 const ENDPOINT_GAME_NEWS: &str = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002";
@@ -18,13 +15,23 @@ struct GameNewsResponse {
 }
 
 /// Response from the GetNewsForApp API
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 pub struct GameNews {
     /// List of [`News`] for a given game ID
     #[serde(rename(deserialize = "newsitems"))]
     pub game_news: Vec<News>,
     /// The total number of available news for the given game ID
     pub count: i16,
+}
+
+impl From<GameNewsResponse> for GameNews {
+    fn from(value: GameNewsResponse) -> Self {
+        let v = value.response.unwrap_or_default();
+        Self {
+            game_news: v.game_news,
+            count: v.count,
+        }
+    }
 }
 
 /// A Steam news object
@@ -88,12 +95,9 @@ impl SteamClient {
             ],
         )?;
 
-        let _res: GameNewsResponse =
-            serde_json::from_value(response).unwrap_or(GameNewsResponse { response: None });
-
-        match _res.response {
-            None => Err(SteamError::NoData),
-            Some(v) => Ok(v),
-        }
+        let news = self
+            .parse_response::<GameNewsResponse, GameNews>(response)
+            .unwrap();
+        Ok(news)
     }
 }

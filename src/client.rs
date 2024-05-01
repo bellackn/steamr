@@ -4,18 +4,8 @@ use crate::errors::SteamError;
 use log::warn;
 use reqwest::blocking::Client;
 use reqwest::StatusCode;
-use serde::Serialize;
+use serde::{de::DeserializeOwned, Serialize};
 use serde_json::Value;
-
-/// Common functions for a Steam API client.
-pub trait ApiClient {
-    /// Send a GET request and return JSON
-    fn get_request<T: Serialize>(
-        &self,
-        endpoint: &str,
-        query: Vec<(&str, T)>,
-    ) -> Result<Value, SteamError>;
-}
 
 /// This struct holds the blocking reqwest client and is used to interact with the API.
 pub struct SteamClient {
@@ -25,13 +15,38 @@ pub struct SteamClient {
     api_key: String,
 }
 
-impl ApiClient for SteamClient {
-    fn get_request<T: Serialize>(
+impl Default for SteamClient {
+    fn default() -> Self {
+        let client = reqwest::blocking::Client::new();
+        Self {
+            client,
+            api_key: String::new(),
+        }
+    }
+}
+
+impl SteamClient {
+    /// Returns a new SteamClient instance carrying a developer API token
+    pub fn from(api_key: String) -> Self {
+        let client = reqwest::blocking::Client::new();
+        Self { client, api_key }
+    }
+
+    /// Return a SteamClient without a Steam API token
+    pub fn new() -> Self {
+        let client = reqwest::blocking::Client::new();
+        Self {
+            client,
+            api_key: String::new(),
+        }
+    }
+
+    pub(crate) fn get_request<T: Serialize>(
         &self,
         endpoint: &str,
         query: Vec<(&str, T)>,
     ) -> Result<Value, SteamError> {
-        if self.api_key.len() == 0 {
+        if self.api_key.is_empty() {
             warn!("Not using a valid API key. Is this on purpose?")
         }
         let response = self
@@ -56,21 +71,16 @@ impl ApiClient for SteamClient {
             )),
         }
     }
-}
 
-impl SteamClient {
-    /// Returns a new SteamClient instance carrying a developer API token
-    pub fn from(api_key: String) -> Self {
-        let client = reqwest::blocking::Client::new();
-        Self { client, api_key }
-    }
-
-    /// Return a SteamClient without a Steam API token
-    pub fn new() -> Self {
-        let client = reqwest::blocking::Client::new();
-        Self {
-            client,
-            api_key: String::new(),
+    pub(crate) fn parse_response<R: DeserializeOwned, S: From<R> + DeserializeOwned>(
+        &self,
+        response: Value,
+    ) -> Result<S, SteamError> {
+        let res = serde_json::from_value::<R>(response);
+        if let Ok(v) = res {
+            Ok(v.into())
+        } else {
+            Err(SteamError::NoData)
         }
     }
 }

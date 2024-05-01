@@ -1,7 +1,7 @@
 use steamr::client::SteamClient;
 
 #[test]
-fn valid_games_response() {
+fn friends_response_is_valid() {
     let test_api_key = std::env::var("IT_API_KEY").expect("IT_API_KEY variable not provided");
     let test_client = SteamClient::from(test_api_key);
     let test_steam_id = std::env::var("IT_STEAM_ID").expect("IT_STEAM_ID variable not provided");

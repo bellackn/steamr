@@ -1,6 +1,6 @@
 //! Functionality dealing with an account's friends
 
-use crate::client::{ApiClient, SteamClient};
+use crate::client::SteamClient;
 use crate::errors::SteamError;
 use serde::Deserialize;
 use std::fmt::Formatter;
@@ -17,10 +17,17 @@ struct FriendsResponse {
 }
 
 /// This is the response that comes from the GetFriendList API.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 pub struct FriendsList {
     /// A list of [`Friend`]s
     pub friends: Vec<Friend>,
+}
+
+impl From<FriendsResponse> for FriendsList {
+    fn from(value: FriendsResponse) -> Self {
+        let v = value.response.unwrap_or_default();
+        Self { friends: v.friends }
+    }
 }
 
 /// Represents a Steam friend and its metadata
@@ -77,7 +84,7 @@ impl SteamClient {
     ///  The standard format of "friends since" is the UNIX timestamp, you might want to get a
     ///  more intuitive time format. You could use the `chrono` crate for this:
     /// ```ignore
-    ///  let steam_friends = get_friends(&steam_client, "some-steam-ID")?;
+    ///  let steam_friends = steam_client.get_friends("some-steam-ID")?;
     ///  steam_friends.iter().for_each(|f| {
     ///      println!(
     ///          "me and {} are friends since {}",
@@ -92,12 +99,9 @@ impl SteamClient {
             vec![("steamid", steam_id), ("relationship", "friend")],
         )?;
 
-        let _res: FriendsResponse =
-            serde_json::from_value(response).unwrap_or(FriendsResponse { response: None });
-
-        match _res.response {
-            None => Err(SteamError::NoData),
-            Some(v) => Ok(v.friends),
-        }
+        let friends_list = self
+            .parse_response::<FriendsResponse, FriendsList>(response)
+            .unwrap();
+        Ok(friends_list.friends)
     }
 }

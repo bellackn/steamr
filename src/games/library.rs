@@ -3,10 +3,7 @@
 use serde::Deserialize;
 use std::fmt::Formatter;
 
-use crate::{
-    client::{ApiClient, SteamClient},
-    errors::SteamError,
-};
+use crate::{client::SteamClient, errors::SteamError};
 
 /// The Steam API "GetOwnedGames (v0001)" endpoint
 const ENDPOINT_OWNED_GAMES: &str =
@@ -19,12 +16,22 @@ struct OwnedGamesResponse {
 }
 
 /// This is the response that comes from the GetOwnedGames API.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 pub struct Library {
     /// Number of games in a user's library
     pub game_count: u32,
     /// List of [`Game`]s in a user's library
     pub games: Vec<Game>,
+}
+
+impl From<OwnedGamesResponse> for Library {
+    fn from(value: OwnedGamesResponse) -> Self {
+        let v = value.response.unwrap_or_default();
+        Self {
+            game_count: v.game_count,
+            games: v.games,
+        }
+    }
 }
 
 /// Represents a game and its metadata.
@@ -92,12 +99,9 @@ impl SteamClient {
             ],
         )?;
 
-        let _res: OwnedGamesResponse =
-            serde_json::from_value(response).unwrap_or(OwnedGamesResponse { response: None });
-
-        match _res.response {
-            None => Err(SteamError::NoData),
-            Some(v) => Ok(v),
-        }
+        let games = self
+            .parse_response::<OwnedGamesResponse, Library>(response)
+            .unwrap();
+        Ok(games)
     }
 }
