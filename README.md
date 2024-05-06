@@ -8,6 +8,19 @@
 steamr is a simple Rust library to help you to interact with Valve's [Steam API](https://developer.valvesoftware.com/wiki/Steam_Web_API).
 It uses the [reqwest](https://github.com/seanmonstar/reqwest) crate under the hood.
 
+> This is a project to gather more hands-on Rust experience. Not all endpoints
+> are implemented and you might find awkward code in here. However, things that
+> _are_ implemented should be quite stable.
+
+## Implemented Endpoints
+
+- [GetFriendList](https://developer.valvesoftware.com/wiki/Steam_Web_API#GetFriendList_.28v0001.29)
+- [GetOwnedGames](https://developer.valvesoftware.com/wiki/Steam_Web_API#GetOwnedGames_.28v0001.29)
+- [GetNewsForApp](https://developer.valvesoftware.com/wiki/Steam_Web_API#GetNewsForApp_.28v0002.29)
+- [GetUserStatsForGame](https://developer.valvesoftware.com/wiki/Steam_Web_API#GetUserStatsForGame_.28v0002.29)
+
+Retrieving data from endpoints works via calling the respective [`SteamClient`](https://docs.rs/steamr/latest/steamr/client/struct.SteamClient.html) method. Check the examples in this README to see how it works.
+
 ## Requirements
 
 You need a valid API key to make full use of this library. Visit <https://steamcommunity.com/dev/apikey> to obtain yours.
